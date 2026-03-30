@@ -39,6 +39,7 @@ export function renderUsageLine(ctx: RenderContext): string | null {
   }
 
   const usageBarEnabled = display?.usageBarEnabled ?? true;
+  const sevenDayBarEnabled = display?.sevenDayBarEnabled ?? usageBarEnabled;
   const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
   const showResetTime = display?.showResetTime !== false;
   const barWidth = getAdaptiveBarWidth(display?.barWidth);
@@ -49,7 +50,7 @@ export function renderUsageLine(ctx: RenderContext): string | null {
       percent: sevenDay,
       resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
       colors,
-      usageBarEnabled,
+      usageBarEnabled: sevenDayBarEnabled,
       barWidth,
       forceLabel: true,
     });
@@ -71,7 +72,7 @@ export function renderUsageLine(ctx: RenderContext): string | null {
       percent: sevenDay,
       resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
       colors,
-      usageBarEnabled,
+      usageBarEnabled: sevenDayBarEnabled,
       barWidth,
     });
     return `${usageLabel} ${fiveHourPart} | ${sevenDayPart}`;

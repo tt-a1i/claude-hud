@@ -41,6 +41,7 @@ export interface HudConfig {
         showTokenBreakdown: boolean;
         showUsage: boolean;
         usageBarEnabled: boolean;
+        sevenDayBarEnabled: boolean;
         showTools: boolean;
         showAgents: boolean;
         showTodos: boolean;

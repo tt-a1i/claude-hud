@@ -174,13 +174,14 @@ export function renderSessionLine(ctx: RenderContext): string {
 
       if (effectiveUsage >= usageThreshold) {
         const usageBarEnabled = display?.usageBarEnabled ?? true;
+        const sevenDayBarEnabled = display?.sevenDayBarEnabled ?? usageBarEnabled;
         if (fiveHour === null && sevenDay !== null) {
           const weeklyOnlyPart = formatUsageWindowPart({
             label: '7d',
             percent: sevenDay,
             resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
             colors,
-            usageBarEnabled,
+            usageBarEnabled: sevenDayBarEnabled,
             barWidth,
             forceLabel: true,
           });
@@ -202,7 +203,7 @@ export function renderSessionLine(ctx: RenderContext): string {
               percent: sevenDay,
               resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
               colors,
-              usageBarEnabled,
+              usageBarEnabled: sevenDayBarEnabled,
               barWidth,
             });
             parts.push(`${fiveHourPart} | ${sevenDayPart}`);

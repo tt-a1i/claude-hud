@@ -35,6 +35,7 @@ export const DEFAULT_CONFIG = {
         showTokenBreakdown: true,
         showUsage: true,
         usageBarEnabled: true,
+        sevenDayBarEnabled: true,
         showTools: false,
         showAgents: false,
         showTodos: false,
@@ -211,6 +212,9 @@ export function mergeConfig(userConfig) {
         usageBarEnabled: typeof migrated.display?.usageBarEnabled === 'boolean'
             ? migrated.display.usageBarEnabled
             : DEFAULT_CONFIG.display.usageBarEnabled,
+        sevenDayBarEnabled: typeof migrated.display?.sevenDayBarEnabled === 'boolean'
+            ? migrated.display.sevenDayBarEnabled
+            : DEFAULT_CONFIG.display.sevenDayBarEnabled,
         showTools: typeof migrated.display?.showTools === 'boolean'
             ? migrated.display.showTools
             : DEFAULT_CONFIG.display.showTools,
