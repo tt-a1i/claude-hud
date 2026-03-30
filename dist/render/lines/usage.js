@@ -30,12 +30,13 @@ export function renderUsageLine(ctx) {
     }
     const usageBarEnabled = display?.usageBarEnabled ?? true;
     const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
+    const showResetTime = display?.showResetTime !== false;
     const barWidth = getAdaptiveBarWidth();
     if (fiveHour === null && sevenDay !== null) {
         const weeklyOnlyPart = formatUsageWindowPart({
             label: '7d',
             percent: sevenDay,
-            resetAt: ctx.usageData.sevenDayResetAt,
+            resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
             colors,
             usageBarEnabled,
             barWidth,
@@ -46,7 +47,7 @@ export function renderUsageLine(ctx) {
     const fiveHourPart = formatUsageWindowPart({
         label: '5h',
         percent: fiveHour,
-        resetAt: ctx.usageData.fiveHourResetAt,
+        resetAt: showResetTime ? ctx.usageData.fiveHourResetAt : null,
         colors,
         usageBarEnabled,
         barWidth,
@@ -55,7 +56,7 @@ export function renderUsageLine(ctx) {
         const sevenDayPart = formatUsageWindowPart({
             label: '7d',
             percent: sevenDay,
-            resetAt: ctx.usageData.sevenDayResetAt,
+            resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
             colors,
             usageBarEnabled,
             barWidth,

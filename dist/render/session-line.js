@@ -8,11 +8,22 @@ const DEBUG = process.env.DEBUG?.includes('claude-hud') || process.env.DEBUG ===
  * Renders the full session line (model + context bar + project + git + counts + usage + duration).
  * Used for compact layout mode.
  */
+function compactifyModelName(name) {
+    const match = name.match(/(?:Claude\s+)?(\w+)[\s\d.]*\((\d+[KMG]?)\s*context\)/i);
+    if (match) {
+        return `${match[1]} ${match[2]}`;
+    }
+    return name.replace(/^Claude\s+/i, '').replace(/\s*\(\d+[KMG]?\s*context\)/i, '');
+}
 export function renderSessionLine(ctx) {
-    const model = getModelName(ctx.stdin);
+    let model = getModelName(ctx.stdin);
+    const display = ctx.config?.display;
+    if (display?.compactModelName) {
+        model = compactifyModelName(model);
+    }
     const rawPercent = getContextPercent(ctx.stdin);
     const bufferedPercent = getBufferedPercent(ctx.stdin);
-    const autocompactMode = ctx.config?.display?.autocompactBuffer ?? 'enabled';
+    const autocompactMode = display?.autocompactBuffer ?? 'enabled';
     const percent = autocompactMode === 'disabled' ? rawPercent : bufferedPercent;
     if (DEBUG && autocompactMode === 'disabled') {
         console.error(`[claude-hud:context] autocompactBuffer=disabled, showing raw ${rawPercent}% (buffered would be ${bufferedPercent}%)`);
@@ -21,7 +32,6 @@ export function renderSessionLine(ctx) {
     const barWidth = getAdaptiveBarWidth();
     const bar = coloredBar(percent, barWidth, colors);
     const parts = [];
-    const display = ctx.config?.display;
     const contextValueMode = display?.contextValue ?? 'percent';
     const contextValue = formatContextValue(ctx, percent, contextValueMode);
     const contextValueDisplay = `${getContextColor(percent, colors)}${contextValue}${RESET}`;
@@ -88,7 +98,12 @@ export function renderSessionLine(ctx) {
                 gitParts.push(` ${statParts.join(' ')}`);
             }
         }
-        gitPart = `${gitColor('git:(', colors)}${gitBranchColor(gitParts.join(''), colors)}${gitColor(')', colors)}`;
+        if (display?.gitUseIcon) {
+            gitPart = `${gitColor('(', colors)}${gitBranchColor(`\ue0a0 ${gitParts.join('')}`, colors)}${gitColor(')', colors)}`;
+        }
+        else {
+            gitPart = `${gitColor('git:(', colors)}${gitBranchColor(gitParts.join(''), colors)}${gitColor(')', colors)}`;
+        }
     }
     if (projectPart && gitPart) {
         parts.push(`${projectPart} ${gitPart}`);
@@ -127,10 +142,13 @@ export function renderSessionLine(ctx) {
     }
     // Usage limits display (shown when enabled in config, respects usageThreshold)
     if (display?.showUsage !== false && ctx.usageData && !providerLabel) {
+        const showResetTime = display?.showResetTime !== false;
         if (isLimitReached(ctx.usageData)) {
-            const resetTime = ctx.usageData.fiveHour === 100
-                ? formatResetTime(ctx.usageData.fiveHourResetAt)
-                : formatResetTime(ctx.usageData.sevenDayResetAt);
+            const resetTime = showResetTime
+                ? (ctx.usageData.fiveHour === 100
+                    ? formatResetTime(ctx.usageData.fiveHourResetAt)
+                    : formatResetTime(ctx.usageData.sevenDayResetAt))
+                : '';
             parts.push(critical(`⚠ Limit reached${resetTime ? ` (resets ${resetTime})` : ''}`, colors));
         }
         else {
@@ -144,7 +162,7 @@ export function renderSessionLine(ctx) {
                     const weeklyOnlyPart = formatUsageWindowPart({
                         label: '7d',
                         percent: sevenDay,
-                        resetAt: ctx.usageData.sevenDayResetAt,
+                        resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
                         colors,
                         usageBarEnabled,
                         barWidth,
@@ -156,7 +174,7 @@ export function renderSessionLine(ctx) {
                     const fiveHourPart = formatUsageWindowPart({
                         label: '5h',
                         percent: fiveHour,
-                        resetAt: ctx.usageData.fiveHourResetAt,
+                        resetAt: showResetTime ? ctx.usageData.fiveHourResetAt : null,
                         colors,
                         usageBarEnabled,
                         barWidth,
@@ -166,7 +184,7 @@ export function renderSessionLine(ctx) {
                         const sevenDayPart = formatUsageWindowPart({
                             label: '7d',
                             percent: sevenDay,
-                            resetAt: ctx.usageData.sevenDayResetAt,
+                            resetAt: showResetTime ? ctx.usageData.sevenDayResetAt : null,
                             colors,
                             usageBarEnabled,
                             barWidth,

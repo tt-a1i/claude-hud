@@ -76,6 +76,10 @@ export interface HudConfig {
     showSessionName: boolean;
     showClaudeCodeVersion: boolean;
     showMemoryUsage: boolean;
+    showContextInline: boolean;
+    compactModelName: boolean;
+    showResetTime: boolean;
+    gitUseIcon: boolean;
     autocompactBuffer: AutocompactBufferMode;
     usageThreshold: number;
     sevenDayThreshold: number;
@@ -113,6 +117,10 @@ export const DEFAULT_CONFIG: HudConfig = {
     showSessionName: false,
     showClaudeCodeVersion: false,
     showMemoryUsage: false,
+    showContextInline: false,
+    compactModelName: false,
+    showResetTime: true,
+    gitUseIcon: false,
     autocompactBuffer: 'enabled',
     usageThreshold: 0,
     sevenDayThreshold: 80,
@@ -316,6 +324,18 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     showMemoryUsage: typeof migrated.display?.showMemoryUsage === 'boolean'
       ? migrated.display.showMemoryUsage
       : DEFAULT_CONFIG.display.showMemoryUsage,
+    showContextInline: typeof migrated.display?.showContextInline === 'boolean'
+      ? migrated.display.showContextInline
+      : DEFAULT_CONFIG.display.showContextInline,
+    compactModelName: typeof migrated.display?.compactModelName === 'boolean'
+      ? migrated.display.compactModelName
+      : DEFAULT_CONFIG.display.compactModelName,
+    showResetTime: typeof migrated.display?.showResetTime === 'boolean'
+      ? migrated.display.showResetTime
+      : DEFAULT_CONFIG.display.showResetTime,
+    gitUseIcon: typeof migrated.display?.gitUseIcon === 'boolean'
+      ? migrated.display.gitUseIcon
+      : DEFAULT_CONFIG.display.gitUseIcon,
     autocompactBuffer: validateAutocompactBuffer(migrated.display?.autocompactBuffer)
       ? migrated.display.autocompactBuffer
       : DEFAULT_CONFIG.display.autocompactBuffer,

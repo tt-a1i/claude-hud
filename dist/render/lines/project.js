@@ -1,18 +1,30 @@
-import { getModelName, getProviderLabel } from '../../stdin.js';
+import { getModelName, getProviderLabel, getContextPercent, getBufferedPercent, getTotalTokens } from '../../stdin.js';
 import { getOutputSpeed } from '../../speed-tracker.js';
-import { git as gitColor, gitBranch as gitBranchColor, label, model as modelColor, project as projectColor, red, custom as customColor } from '../colors.js';
+import { git as gitColor, gitBranch as gitBranchColor, label, model as modelColor, project as projectColor, red, custom as customColor, getContextColor, RESET } from '../colors.js';
 export function renderProjectLine(ctx) {
     const display = ctx.config?.display;
     const colors = ctx.config?.colors;
     const parts = [];
     if (display?.showModel !== false) {
-        const model = getModelName(ctx.stdin);
+        let model = getModelName(ctx.stdin);
+        if (display?.compactModelName) {
+            model = compactifyModelName(model);
+        }
         const providerLabel = getProviderLabel(ctx.stdin);
         const showUsage = display?.showUsage !== false;
         const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
         const modelQualifier = providerLabel ?? (showUsage && hasApiKey ? red('API') : undefined);
         const modelDisplay = modelQualifier ? `${model} | ${modelQualifier}` : model;
         parts.push(modelColor(`[${modelDisplay}]`, colors));
+    }
+    if (display?.showContextInline) {
+        const rawPercent = getContextPercent(ctx.stdin);
+        const bufferedPercent = getBufferedPercent(ctx.stdin);
+        const autocompactMode = display?.autocompactBuffer ?? 'enabled';
+        const percent = autocompactMode === 'disabled' ? rawPercent : bufferedPercent;
+        const contextValueMode = display?.contextValue ?? 'percent';
+        const contextValue = formatInlineContextValue(ctx, percent, contextValueMode);
+        parts.push(`${getContextColor(percent, colors)}${contextValue}${RESET}`);
     }
     let projectPart = null;
     if (display?.showProject !== false && ctx.stdin.cwd) {
@@ -52,7 +64,12 @@ export function renderProjectLine(ctx) {
                 gitParts.push(` ${statParts.join(' ')}`);
             }
         }
-        gitPart = `${gitColor('git:(', colors)}${gitBranchColor(gitParts.join(''), colors)}${gitColor(')', colors)}`;
+        if (display?.gitUseIcon) {
+            gitPart = `${gitColor('(', colors)}${gitBranchColor(`\ue0a0 ${gitParts.join('')}`, colors)}${gitColor(')', colors)}`;
+        }
+        else {
+            gitPart = `${gitColor('git:(', colors)}${gitBranchColor(gitParts.join(''), colors)}${gitColor(')', colors)}`;
+        }
     }
     if (projectPart && gitPart) {
         parts.push(`${projectPart} ${gitPart}`);
@@ -89,5 +106,38 @@ export function renderProjectLine(ctx) {
         return null;
     }
     return parts.join(' \u2502 ');
+}
+function compactifyModelName(name) {
+    // "Claude Opus 4.6 (1M context)" → "Opus 1M"
+    // "Claude Sonnet 4.6 (200K context)" → "Sonnet 200K"
+    const match = name.match(/(?:Claude\s+)?(\w+)[\s\d.]*\((\d+[KMG]?)\s*context\)/i);
+    if (match) {
+        return `${match[1]} ${match[2]}`;
+    }
+    // Fallback: strip "Claude " prefix and " context)" suffix
+    return name.replace(/^Claude\s+/i, '').replace(/\s*\(\d+[KMG]?\s*context\)/i, '');
+}
+function formatTokens(n) {
+    if (n >= 1000000) {
+        return `${(n / 1000000).toFixed(1)}M`;
+    }
+    if (n >= 1000) {
+        return `${(n / 1000).toFixed(0)}k`;
+    }
+    return n.toString();
+}
+function formatInlineContextValue(ctx, percent, mode) {
+    const totalTokens = getTotalTokens(ctx.stdin);
+    const size = ctx.stdin.context_window?.context_window_size ?? 0;
+    if (mode === 'tokens') {
+        return size > 0 ? `${formatTokens(totalTokens)}/${formatTokens(size)}` : formatTokens(totalTokens);
+    }
+    if (mode === 'both') {
+        return size > 0 ? `${percent}% (${formatTokens(totalTokens)}/${formatTokens(size)})` : `${percent}%`;
+    }
+    if (mode === 'remaining') {
+        return `${Math.max(0, 100 - percent)}%`;
+    }
+    return `${percent}%`;
 }
 //# sourceMappingURL=project.js.map

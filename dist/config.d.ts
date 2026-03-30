@@ -47,6 +47,10 @@ export interface HudConfig {
         showSessionName: boolean;
         showClaudeCodeVersion: boolean;
         showMemoryUsage: boolean;
+        showContextInline: boolean;
+        compactModelName: boolean;
+        showResetTime: boolean;
+        gitUseIcon: boolean;
         autocompactBuffer: AutocompactBufferMode;
         usageThreshold: number;
         sevenDayThreshold: number;

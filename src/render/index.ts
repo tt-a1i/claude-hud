@@ -374,9 +374,16 @@ function renderExpanded(ctx: RenderContext): Array<{ line: string; isActivity: b
   const seen = new Set<HudElement>();
   const lines: Array<{ line: string; isActivity: boolean }> = [];
 
+  const contextInline = ctx.config?.display?.showContextInline === true;
+
   for (let index = 0; index < elementOrder.length; index += 1) {
     const element = elementOrder[index];
     if (seen.has(element)) {
+      continue;
+    }
+
+    if (contextInline && element === 'context') {
+      seen.add('context');
       continue;
     }
 
