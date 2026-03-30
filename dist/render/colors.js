@@ -109,7 +109,7 @@ export function getQuotaColor(percent, colors) {
 export function quotaBar(percent, width = 10, colors) {
     const safeWidth = Number.isFinite(width) ? Math.max(0, Math.round(width)) : 0;
     const safePercent = Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0;
-    const filled = Math.round((safePercent / 100) * safeWidth);
+    const filled = safePercent > 0 ? Math.max(1, Math.round((safePercent / 100) * safeWidth)) : 0;
     const empty = safeWidth - filled;
     const color = getQuotaColor(safePercent, colors);
     return `${color}${'█'.repeat(filled)}${DIM}${'░'.repeat(empty)}${RESET}`;
@@ -117,7 +117,7 @@ export function quotaBar(percent, width = 10, colors) {
 export function coloredBar(percent, width = 10, colors) {
     const safeWidth = Number.isFinite(width) ? Math.max(0, Math.round(width)) : 0;
     const safePercent = Number.isFinite(percent) ? Math.min(100, Math.max(0, percent)) : 0;
-    const filled = Math.round((safePercent / 100) * safeWidth);
+    const filled = safePercent > 0 ? Math.max(1, Math.round((safePercent / 100) * safeWidth)) : 0;
     const empty = safeWidth - filled;
     const color = getContextColor(safePercent, colors);
     return `${color}${'█'.repeat(filled)}${DIM}${'░'.repeat(empty)}${RESET}`;
