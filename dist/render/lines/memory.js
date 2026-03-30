@@ -16,7 +16,7 @@ export function renderMemoryLine(ctx) {
     const memoryLabel = label('Approx RAM', colors);
     const percentColor = getQuotaColor(ctx.memoryUsage.usedPercent, colors);
     const percent = `${percentColor}${ctx.memoryUsage.usedPercent}%${RESET}`;
-    const bar = quotaBar(ctx.memoryUsage.usedPercent, getAdaptiveBarWidth(), colors);
+    const bar = quotaBar(ctx.memoryUsage.usedPercent, getAdaptiveBarWidth(ctx.config?.display?.barWidth), colors);
     return `${memoryLabel} ${bar} ${formatBytes(ctx.memoryUsage.usedBytes)} / ${formatBytes(ctx.memoryUsage.totalBytes)} (${percent})`;
 }
 //# sourceMappingURL=memory.js.map

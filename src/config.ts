@@ -80,6 +80,7 @@ export interface HudConfig {
     compactModelName: boolean;
     showResetTime: boolean;
     gitUseIcon: boolean;
+    barWidth: number;
     autocompactBuffer: AutocompactBufferMode;
     usageThreshold: number;
     sevenDayThreshold: number;
@@ -121,6 +122,7 @@ export const DEFAULT_CONFIG: HudConfig = {
     compactModelName: false,
     showResetTime: true,
     gitUseIcon: false,
+    barWidth: 0,
     autocompactBuffer: 'enabled',
     usageThreshold: 0,
     sevenDayThreshold: 80,
@@ -336,6 +338,12 @@ export function mergeConfig(userConfig: Partial<HudConfig>): HudConfig {
     gitUseIcon: typeof migrated.display?.gitUseIcon === 'boolean'
       ? migrated.display.gitUseIcon
       : DEFAULT_CONFIG.display.gitUseIcon,
+    barWidth: typeof migrated.display?.barWidth === 'number'
+      && Number.isInteger(migrated.display.barWidth)
+      && migrated.display.barWidth >= 0
+      && migrated.display.barWidth <= 30
+      ? migrated.display.barWidth
+      : DEFAULT_CONFIG.display.barWidth,
     autocompactBuffer: validateAutocompactBuffer(migrated.display?.autocompactBuffer)
       ? migrated.display.autocompactBuffer
       : DEFAULT_CONFIG.display.autocompactBuffer,

@@ -41,7 +41,7 @@ export function renderUsageLine(ctx: RenderContext): string | null {
   const usageBarEnabled = display?.usageBarEnabled ?? true;
   const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
   const showResetTime = display?.showResetTime !== false;
-  const barWidth = getAdaptiveBarWidth();
+  const barWidth = getAdaptiveBarWidth(display?.barWidth);
 
   if (fiveHour === null && sevenDay !== null) {
     const weeklyOnlyPart = formatUsageWindowPart({

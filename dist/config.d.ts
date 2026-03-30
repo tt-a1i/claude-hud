@@ -51,6 +51,7 @@ export interface HudConfig {
         compactModelName: boolean;
         showResetTime: boolean;
         gitUseIcon: boolean;
+        barWidth: number;
         autocompactBuffer: AutocompactBufferMode;
         usageThreshold: number;
         sevenDayThreshold: number;

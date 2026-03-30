@@ -36,7 +36,7 @@ export function renderSessionLine(ctx: RenderContext): string {
   }
 
   const colors = ctx.config?.colors;
-  const barWidth = getAdaptiveBarWidth();
+  const barWidth = getAdaptiveBarWidth(display?.barWidth);
   const bar = coloredBar(percent, barWidth, colors);
 
   const parts: string[] = [];

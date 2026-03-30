@@ -29,7 +29,7 @@ export function renderSessionLine(ctx) {
         console.error(`[claude-hud:context] autocompactBuffer=disabled, showing raw ${rawPercent}% (buffered would be ${bufferedPercent}%)`);
     }
     const colors = ctx.config?.colors;
-    const barWidth = getAdaptiveBarWidth();
+    const barWidth = getAdaptiveBarWidth(display?.barWidth);
     const bar = coloredBar(percent, barWidth, colors);
     const parts = [];
     const contextValueMode = display?.contextValue ?? 'percent';

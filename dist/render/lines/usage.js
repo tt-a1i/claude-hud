@@ -31,7 +31,7 @@ export function renderUsageLine(ctx) {
     const usageBarEnabled = display?.usageBarEnabled ?? true;
     const sevenDayThreshold = display?.sevenDayThreshold ?? 80;
     const showResetTime = display?.showResetTime !== false;
-    const barWidth = getAdaptiveBarWidth();
+    const barWidth = getAdaptiveBarWidth(display?.barWidth);
     if (fiveHour === null && sevenDay !== null) {
         const weeklyOnlyPart = formatUsageWindowPart({
             label: '7d',

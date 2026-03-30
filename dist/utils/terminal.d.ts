@@ -1,2 +1,2 @@
-export declare function getAdaptiveBarWidth(): number;
+export declare function getAdaptiveBarWidth(configBarWidth?: number): number;
 //# sourceMappingURL=terminal.d.ts.map
